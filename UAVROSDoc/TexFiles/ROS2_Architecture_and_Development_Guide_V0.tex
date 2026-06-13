@@ -1,0 +1,509 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{listings}
+
+\title{ROS 2 Architecture and Development Guide}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+ROS 2 (Robot Operating System 2) is a distributed middleware framework used to build robotic systems.
+ROS 2 is not an operating system. It is a collection of libraries, tools, communication middleware,
+build systems, and conventions that help developers build modular robotic applications.
+
+Major goals of ROS 2:
+
+\begin{itemize}
+\item Distributed communication
+\item Real-time support
+\item Multi-platform support
+\item Security
+\item Scalability
+\item DDS-based communication
+\end{itemize}
+
+\section{ROS 2 Architectural Layers}
+
+\subsection{Application Layer}
+
+Contains user-developed nodes.
+
+Examples:
+
+\begin{itemize}
+\item Sensor drivers
+\item Perception nodes
+\item Navigation nodes
+\item Control nodes
+\item Visualization nodes
+\end{itemize}
+
+\subsection{Client Libraries}
+
+Provide APIs used by developers.
+
+Common libraries:
+
+\begin{itemize}
+\item rclcpp (C++)
+\item rclpy (Python)
+\end{itemize}
+
+Responsibilities:
+
+\begin{itemize}
+\item Node creation
+\item Publisher creation
+\item Subscriber creation
+\item Services
+\item Actions
+\item Parameters
+\end{itemize}
+
+\subsection{RCL Layer}
+
+The ROS Client Library (RCL) provides a language-independent abstraction.
+
+Responsibilities:
+
+\begin{itemize}
+\item Graph management
+\item Discovery support
+\item Topic management
+\item Service management
+\item Parameter handling
+\end{itemize}
+
+\subsection{RMW Layer}
+
+RMW (ROS Middleware Interface) abstracts DDS implementations.
+
+Examples:
+
+\begin{itemize}
+\item Fast DDS
+\item Cyclone DDS
+\item Connext DDS
+\end{itemize}
+
+The application code remains unchanged regardless of DDS vendor.
+
+\subsection{DDS Layer}
+
+DDS (Data Distribution Service) provides:
+
+\begin{itemize}
+\item Discovery
+\item Publish-subscribe communication
+\item Quality of Service (QoS)
+\item Reliable transport
+\item Best-effort transport
+\end{itemize}
+
+\section{ROS 2 Graph}
+
+A ROS graph consists of:
+
+\begin{itemize}
+\item Nodes
+\item Topics
+\item Services
+\item Actions
+\item Parameters
+\end{itemize}
+
+Example:
+
+\begin{verbatim}
+Talker Node ---> Topic (/chatter) ---> Listener Node
+\end{verbatim}
+
+\section{Nodes}
+
+A node is an executable participating in the ROS graph.
+
+Responsibilities:
+
+\begin{itemize}
+\item Publish messages
+\item Subscribe to messages
+\item Provide services
+\item Consume services
+\item Manage parameters
+\end{itemize}
+
+\section{Topics}
+
+Topics implement asynchronous communication.
+
+Characteristics:
+
+\begin{itemize}
+\item One-to-many communication
+\item Many-to-many communication
+\item Decoupled publishers and subscribers
+\end{itemize}
+
+\section{Services}
+
+Services implement request-response communication.
+
+Example:
+
+\begin{verbatim}
+Client ---> Request ---> Server
+Client <--- Response --- Server
+\end{verbatim}
+
+\section{Actions}
+
+Actions are used for long-running tasks.
+
+Example:
+
+\begin{itemize}
+\item Navigation
+\item Manipulator motion
+\item Autonomous missions
+\end{itemize}
+
+Actions support:
+
+\begin{itemize}
+\item Feedback
+\item Cancellation
+\item Progress monitoring
+\end{itemize}
+
+\section{ROS 2 Development Workflow}
+
+\subsection{Workspace}
+
+A workspace contains source code and build artifacts.
+
+Typical structure:
+
+\begin{verbatim}
+ros2_ws/
+ ├── src/
+ ├── build/
+ ├── install/
+ └── log/
+\end{verbatim}
+
+\subsection{Creating a Workspace}
+
+\begin{verbatim}
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws
+colcon build
+\end{verbatim}
+
+\subsection{Building}
+
+ROS 2 uses Colcon.
+
+\begin{verbatim}
+colcon build
+\end{verbatim}
+
+\subsection{Sourcing}
+
+\begin{verbatim}
+source install/setup.bash
+\end{verbatim}
+
+\section{Talker and Listener Deep Dive}
+
+The demo consists of:
+
+\begin{itemize}
+\item demo\_nodes\_cpp talker
+\item demo\_nodes\_py listener
+\end{itemize}
+
+Topic:
+
+\begin{verbatim}
+/chatter
+\end{verbatim}
+
+Message Type:
+
+\begin{verbatim}
+std_msgs/msg/String
+\end{verbatim}
+
+\section{Process Creation}
+
+When you execute:
+
+\begin{verbatim}
+ros2 run demo_nodes_cpp talker
+\end{verbatim}
+
+The following happens:
+
+\begin{enumerate}
+\item Shell launches process.
+\item Linux kernel creates process.
+\item Executable is loaded into memory.
+\item Shared libraries are loaded.
+\item main() begins execution.
+\item rclcpp::init() initializes ROS.
+\item DDS participant is created.
+\item Node object is created.
+\item Publisher is created.
+\end{enumerate}
+
+\section{Talker Startup Sequence}
+
+Internal flow:
+
+\begin{verbatim}
+main()
+ |
+ +--> rclcpp::init()
+ |
+ +--> create node
+ |
+ +--> create publisher
+ |
+ +--> create timer
+ |
+ +--> spin()
+\end{verbatim}
+
+Publisher:
+
+\begin{verbatim}
+publisher_ =
+create_publisher<std_msgs::msg::String>(
+    "chatter", 10);
+\end{verbatim}
+
+Timer fires every 500 ms.
+
+\section{Message Creation}
+
+Each timer callback:
+
+\begin{enumerate}
+\item Creates String message.
+\item Fills text.
+\item Increments counter.
+\item Calls publish().
+\end{enumerate}
+
+Example:
+
+\begin{verbatim}
+Hello World: 42
+\end{verbatim}
+
+\section{Serialization}
+
+The publisher does not directly send a C++ object.
+
+Steps:
+
+\begin{enumerate}
+\item Message created in memory.
+\item ROS middleware serializes data.
+\item DDS packet generated.
+\item Network transport selected.
+\end{enumerate}
+
+\section{DDS Discovery}
+
+Before communication begins:
+
+\begin{enumerate}
+\item DDS participant announces itself.
+\item Listener announces itself.
+\item Discovery protocol exchanges metadata.
+\item Topic compatibility verified.
+\item Communication path established.
+\end{enumerate}
+
+No ROS master is required in ROS 2.
+
+\section{Listener Startup}
+
+Command:
+
+\begin{verbatim}
+ros2 run demo_nodes_py listener
+\end{verbatim}
+
+Startup flow:
+
+\begin{verbatim}
+main()
+ |
+ +--> rclpy.init()
+ |
+ +--> create node
+ |
+ +--> create subscriber
+ |
+ +--> spin()
+\end{verbatim}
+
+Subscriber registers callback.
+
+\section{Message Reception}
+
+Sequence:
+
+\begin{enumerate}
+\item DDS receives packet.
+\item Packet deserialized.
+\item Message reconstructed.
+\item Callback scheduled.
+\item Executor invokes callback.
+\item Message printed.
+\end{enumerate}
+
+Callback:
+
+\begin{verbatim}
+def listener_callback(msg):
+    print(msg.data)
+\end{verbatim}
+
+\section{End-to-End Message Flow}
+
+\begin{verbatim}
+Application (Talker)
+      |
+      v
+rclcpp
+      |
+      v
+RCL
+      |
+      v
+RMW
+      |
+      v
+DDS Writer
+      |
+      v
+Network / Shared Memory
+      |
+      v
+DDS Reader
+      |
+      v
+RMW
+      |
+      v
+RCL
+      |
+      v
+rclpy
+      |
+      v
+Application (Listener)
+\end{verbatim}
+
+\section{Executors}
+
+Executors process callbacks.
+
+Types:
+
+\begin{itemize}
+\item SingleThreadedExecutor
+\item MultiThreadedExecutor
+\end{itemize}
+
+Responsibilities:
+
+\begin{itemize}
+\item Timer callbacks
+\item Subscriber callbacks
+\item Service callbacks
+\item Action callbacks
+\end{itemize}
+
+\section{Quality of Service}
+
+QoS controls communication behavior.
+
+Important settings:
+
+\begin{itemize}
+\item Reliability
+\item Durability
+\item History
+\item Deadline
+\item Lifespan
+\end{itemize}
+
+Common reliability modes:
+
+\begin{itemize}
+\item Reliable
+\item Best Effort
+\end{itemize}
+
+\section{Memory and Threading}
+
+Typical talker execution:
+
+\begin{itemize}
+\item Main thread
+\item Executor loop
+\item DDS background threads
+\item Network threads
+\end{itemize}
+
+\section{Debugging Tools}
+
+Useful commands:
+
+\begin{verbatim}
+ros2 node list
+ros2 topic list
+ros2 topic echo /chatter
+ros2 topic info /chatter
+ros2 doctor
+\end{verbatim}
+
+\section{Recommended Learning Path}
+
+\begin{enumerate}
+\item Nodes
+\item Topics
+\item Services
+\item Actions
+\item Parameters
+\item Launch files
+\item Custom messages
+\item Lifecycle nodes
+\item Navigation stack
+\item MoveIt
+\item Real-time systems
+\end{enumerate}
+
+\section{Summary}
+
+ROS 2 applications are composed of nodes communicating through DDS.
+The talker creates messages, DDS discovers subscribers, messages are serialized,
+transported, deserialized, and delivered through executors to subscriber callbacks.
+Understanding this end-to-end flow is fundamental for designing scalable robotic systems.
+
+\end{document}

@@ -1,0 +1,171 @@
+
+\documentclass[11pt,oneside]{book}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{enumitem}
+
+\title{ROS 2 Engineering Curriculum \\ Volume 1: Fundamentals}
+\author{Self-Study Edition}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Learning Roadmap}
+This volume takes a learner from zero knowledge of ROS 2 to the point where
+they can create packages, nodes, publishers, subscribers, services, actions,
+and launch files.
+
+\chapter{What is ROS 2?}
+\section{Why Robotics Needs Middleware}
+Robots consist of many independent subsystems:
+sensors, perception, planning, control, and actuators.
+ROS 2 provides a common communication framework.
+
+\section{ROS 1 vs ROS 2}
+Topics:
+\begin{itemize}
+\item DDS
+\item Discovery
+\item Security
+\item Real-time support
+\item Embedded support
+\end{itemize}
+
+\section*{Exercises}
+Explain why a robot should be split into multiple nodes.
+
+\chapter{Installing ROS 2}
+Ubuntu installation workflow, environment setup,
+workspace creation, and verification.
+
+\chapter{ROS 2 Architecture}
+Layers:
+\begin{enumerate}
+\item Application
+\item rclcpp/rclpy/rclc
+\item rcl
+\item rmw
+\item DDS
+\item Network Transport
+\end{enumerate}
+
+Detailed discussion of responsibilities of each layer.
+
+\chapter{Nodes}
+Node lifecycle:
+\begin{enumerate}
+\item Process creation
+\item ROS initialization
+\item Node creation
+\item Communication setup
+\item Execution
+\item Shutdown
+\end{enumerate}
+
+Lab: Create a node in C++ and Python.
+
+\chapter{Topics}
+Publisher/subscriber communication model.
+
+Lab:
+Create a temperature publisher and subscriber.
+
+Quiz:
+Difference between synchronous and asynchronous communication.
+
+\chapter{Messages}
+Message definitions, standard interfaces,
+custom messages, and serialization basics.
+
+Lab:
+Create a custom message package.
+
+\chapter{Services}
+Request-response communication.
+
+Lab:
+Build a calculator service.
+
+\chapter{Actions}
+Goal, feedback, result model.
+
+Lab:
+Build a countdown action server.
+
+\chapter{Parameters}
+Runtime configuration management.
+
+Lab:
+Create configurable nodes.
+
+\chapter{Launch Files}
+Python launch system, node orchestration,
+parameter injection, remapping.
+
+Lab:
+Launch three communicating nodes.
+
+\chapter{Development with C++}
+rclcpp fundamentals, node classes,
+publishers, subscribers, services,
+actions, timers, parameters.
+
+Programming exercises included.
+
+\chapter{Development with Python}
+rclpy fundamentals, callback design,
+timers, services, actions.
+
+Programming exercises included.
+
+\chapter{Workspace and Build System}
+colcon, ament, package.xml,
+CMakeLists.txt, dependency management.
+
+Lab:
+Build a multi-package workspace.
+
+\chapter{Debugging and Introspection}
+Commands:
+\begin{verbatim}
+ros2 node list
+ros2 topic list
+ros2 topic echo
+ros2 topic info
+ros2 doctor
+\end{verbatim}
+
+Lab:
+Investigate a running ROS graph.
+
+\chapter{Mini Projects}
+
+Project 1:
+Robot health monitor.
+
+Project 2:
+Sensor dashboard.
+
+Project 3:
+Multi-node telemetry system.
+
+\chapter{Final Assessment}
+
+Written questions:
+\begin{enumerate}
+\item Explain the ROS graph.
+\item Explain publishers and subscribers.
+\item Compare services and actions.
+\item Describe message serialization.
+\item Describe package dependencies.
+\end{enumerate}
+
+Practical exam:
+Create a complete ROS 2 application from scratch.
+
+\end{document}

@@ -1,0 +1,488 @@
+
+\documentclass[11pt,oneside]{book}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+
+\title{ROS 2: From Beginner to Advanced}
+\author{Generated Study Guide}
+\date{\today}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+\tableofcontents
+
+\chapter*{Preface}
+
+This book is designed as a complete learning path for ROS 2 developers,
+starting with installation and basic concepts and progressing toward DDS,
+real-time systems, lifecycle nodes, navigation, perception, and production
+robot architectures.
+
+\mainmatter
+
+\part{Foundations}
+
+\chapter{Introduction to ROS 2}
+\section{What is ROS 2?}
+ROS 2 is a distributed robotics middleware framework built on DDS.
+
+\section{Why ROS 2 Replaced ROS 1}
+\begin{itemize}
+\item DDS-based communication
+\item Real-time support
+\item Security
+\item Multi-platform support
+\item Improved scalability
+\end{itemize}
+
+\chapter{ROS 2 Architecture}
+
+\section{Layered Architecture}
+
+\begin{verbatim}
+Application
+    |
+rclcpp / rclpy / rclc
+    |
+rcl
+    |
+rmw
+    |
+DDS
+    |
+Network
+\end{verbatim}
+
+\section{ROS Graph}
+Nodes communicate through topics, services, and actions.
+
+\chapter{Installation and Workspace Setup}
+
+\section{Ubuntu Installation}
+\subsection{Ubuntu 24.04}
+Install ROS 2 Jazzy.
+
+\subsection{Ubuntu 26.04}
+Install ROS 2 Lyrical.
+
+\section{Workspace Layout}
+
+\begin{verbatim}
+workspace/
+ ├── src/
+ ├── build/
+ ├── install/
+ └── log/
+\end{verbatim}
+
+\chapter{ROS 2 Command Line Tools}
+
+\section{Node Commands}
+
+\begin{verbatim}
+ros2 node list
+ros2 node info
+\end{verbatim}
+
+\section{Topic Commands}
+
+\begin{verbatim}
+ros2 topic list
+ros2 topic echo
+ros2 topic hz
+\end{verbatim}
+
+\part{Programming Fundamentals}
+
+\chapter{Nodes}
+
+\section{Node Lifecycle}
+
+\begin{verbatim}
+Process
+  |
+Node Creation
+  |
+Publisher/Subscriber Creation
+  |
+Spin
+  |
+Shutdown
+\end{verbatim}
+
+\chapter{Topics, Publishers and Subscribers}
+
+\section{Publisher}
+
+C++ Example:
+
+\begin{lstlisting}[language=C++]
+publisher_ =
+create_publisher<std_msgs::msg::String>(
+    "chatter",10);
+\end{lstlisting}
+
+Python Example:
+
+\begin{lstlisting}[language=Python]
+self.publisher_ = self.create_publisher(
+    String,"chatter",10)
+\end{lstlisting}
+
+\chapter{Services and Actions}
+
+\section{Service Flow}
+
+\begin{verbatim}
+Client --> Request
+Server --> Response
+\end{verbatim}
+
+\section{Action Flow}
+
+\begin{verbatim}
+Goal
+  |
+Feedback
+  |
+Result
+\end{verbatim}
+
+\chapter{Parameters}
+
+Managing runtime configuration with parameters.
+
+\part{C Development}
+
+\chapter{ROS 2 C Programming}
+
+\section{rclc Architecture}
+
+\begin{verbatim}
+Application
+   |
+rclc
+   |
+rcl
+   |
+rmw
+\end{verbatim}
+
+\section{Publisher Example}
+
+\begin{lstlisting}[language=C]
+rcl_publisher_t publisher;
+\end{lstlisting}
+
+\chapter{Micro-ROS}
+
+\begin{itemize}
+\item Embedded systems
+\item STM32
+\item ESP32
+\item Real-time applications
+\end{itemize}
+
+\part{C++ Development}
+
+\chapter{ROS 2 with rclcpp}
+
+\section{Node Class}
+
+\begin{lstlisting}[language=C++]
+class MyNode :
+public rclcpp::Node
+{
+};
+\end{lstlisting}
+
+\chapter{Executors}
+
+\section{Single Threaded Executor}
+
+\begin{lstlisting}[language=C++]
+rclcpp::spin(node);
+\end{lstlisting}
+
+\section{Multi Threaded Executor}
+
+Callback groups and concurrency.
+
+\chapter{Components and Composition}
+
+\begin{itemize}
+\item Dynamic loading
+\item Shared process execution
+\item Reduced memory usage
+\end{itemize}
+
+\part{Python Development}
+
+\chapter{ROS 2 with rclpy}
+
+\section{Python Node}
+
+\begin{lstlisting}[language=Python]
+class MyNode(Node):
+    pass
+\end{lstlisting}
+
+\chapter{Async Programming}
+
+Timers, futures and asynchronous service calls.
+
+\part{Communication Deep Dive}
+
+\chapter{DDS Fundamentals}
+
+\section{DDS Concepts}
+
+\begin{itemize}
+\item Domain Participant
+\item Publisher
+\item Subscriber
+\item DataWriter
+\item DataReader
+\end{itemize}
+
+\chapter{Discovery Process}
+
+\section{Automatic Discovery}
+
+\begin{verbatim}
+Publisher Announce
+        |
+Discovery Traffic
+        |
+Subscriber Match
+        |
+Connection Established
+\end{verbatim}
+
+\chapter{Message Serialization}
+
+\section{Serialization Path}
+
+\begin{verbatim}
+ROS Message
+     |
+Serializer
+     |
+DDS Packet
+     |
+Network
+\end{verbatim}
+
+\chapter{QoS}
+
+\begin{longtable}{|p{2in}|p{3in}|}
+\hline
+Policy & Purpose \\ \hline
+Reliability & Best effort or reliable \\ \hline
+History & Message history \\ \hline
+Durability & Persistence \\ \hline
+Deadline & Timing guarantees \\ \hline
+\end{longtable}
+
+\part{Talker and Listener Internals}
+
+\chapter{Talker Process Internals}
+
+\section{Process Creation}
+
+\begin{verbatim}
+ros2 run demo_nodes_cpp talker
+\end{verbatim}
+
+OS creates process.
+
+\section{Initialization}
+
+\begin{enumerate}
+\item main()
+\item rclcpp::init()
+\item Node Creation
+\item Publisher Creation
+\item DDS Participant Creation
+\end{enumerate}
+
+\chapter{Listener Process Internals}
+
+\section{Initialization}
+
+\begin{enumerate}
+\item Process Creation
+\item Node Creation
+\item Subscription Creation
+\item DDS Discovery
+\end{enumerate}
+
+\chapter{End-to-End Message Journey}
+
+\section{Detailed Sequence Diagram}
+
+\begin{verbatim}
+Talker
+  |
+Create Message
+  |
+Serialize
+  |
+DDS Writer
+  |
+UDP/TCP Transport
+  |
+DDS Reader
+  |
+Deserialize
+  |
+Callback Queue
+  |
+Executor
+  |
+Listener Callback
+\end{verbatim}
+
+\section{Executor Scheduling}
+
+Executors wait on DDS events and invoke callbacks when data arrives.
+
+\part{Advanced Topics}
+
+\chapter{Custom Messages}
+
+Creating custom interfaces using msg, srv, and action files.
+
+\chapter{Lifecycle Nodes}
+
+\begin{verbatim}
+Unconfigured
+     |
+Configured
+     |
+Active
+     |
+Inactive
+     |
+Finalized
+\end{verbatim}
+
+\chapter{Security}
+
+ROS 2 Security (SROS2):
+
+\begin{itemize}
+\item Authentication
+\item Encryption
+\item Access control
+\end{itemize}
+
+\chapter{Real-Time ROS 2}
+
+Topics include:
+
+\begin{itemize}
+\item Deterministic scheduling
+\item Lock-free communication
+\item Real-time executors
+\end{itemize}
+
+\chapter{Zero-Copy Communication}
+
+Reducing memory copies for large sensor messages.
+
+\part{Robot Systems}
+
+\chapter{Sensors}
+
+\begin{itemize}
+\item Cameras
+\item LiDAR
+\item IMU
+\item GPS
+\end{itemize}
+
+\chapter{Navigation Stack}
+
+\begin{verbatim}
+Map
+ |
+Localization
+ |
+Planning
+ |
+Control
+ |
+Robot
+\end{verbatim}
+
+\chapter{Perception}
+
+Object detection and sensor fusion.
+
+\chapter{Manipulation}
+
+MoveIt and robotic arms.
+
+\part{Production Systems}
+
+\chapter{Multi-Robot Systems}
+
+DDS domains and fleet management.
+
+\chapter{Testing}
+
+\begin{itemize}
+\item Unit Testing
+\item Integration Testing
+\item Simulation Testing
+\end{itemize}
+
+\chapter{CI/CD for ROS 2}
+
+GitHub Actions and automated builds.
+
+\chapter{Performance Analysis}
+
+\begin{verbatim}
+ros2 topic hz
+ros2 topic bw
+ros2 doctor
+\end{verbatim}
+
+\chapter{Debugging}
+
+\begin{itemize}
+\item rqt_graph
+\item topic echo
+\item DDS tools
+\item Wireshark
+\end{itemize}
+
+\backmatter
+
+\chapter{Capstone Projects}
+
+\begin{enumerate}
+\item Differential drive robot
+\item Autonomous mobile robot
+\item Multi-robot coordination
+\item Vision-based pick-and-place robot
+\item Autonomous warehouse robot
+\end{enumerate}
+
+\chapter{Further Reading}
+
+Official ROS 2 documentation, DDS specifications,
+Navigation2, MoveIt, Gazebo, and Micro-ROS.
+
+\end{document}

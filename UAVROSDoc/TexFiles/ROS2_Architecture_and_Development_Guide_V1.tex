@@ -1,0 +1,522 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{enumitem}
+
+\title{ROS 2 Architecture and Development Guide}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+ROS 2 (Robot Operating System 2) is a middleware framework for building distributed robotic systems.
+ROS 2 is not an operating system. It is a collection of libraries, tools, communication middleware,
+build systems, and conventions that simplify robot software development.
+
+Key goals of ROS 2:
+
+\begin{itemize}
+\item Distributed communication
+\item Real-time support
+\item Security support
+\item Multi-platform operation
+\item Scalable architecture
+\item DDS-based communication
+\end{itemize}
+
+\section{High-Level ROS 2 Architecture}
+
+A ROS 2 application consists of:
+
+\begin{itemize}
+\item Nodes
+\item Topics
+\item Publishers
+\item Subscribers
+\item Services
+\item Actions
+\item Parameters
+\item DDS Middleware
+\end{itemize}
+
+Architecture Flow:
+
+\begin{verbatim}
++-------------+
+| Application |
++-------------+
+       |
+       v
++-------------+
+| rclcpp/rclpy|
++-------------+
+       |
+       v
++-------------+
+| rcl Layer   |
++-------------+
+       |
+       v
++-------------+
+| rmw Layer   |
++-------------+
+       |
+       v
++-------------+
+| DDS Vendor  |
++-------------+
+       |
+       v
++-------------+
+| Network     |
++-------------+
+\end{verbatim}
+
+\section{Core Concepts}
+
+\subsection{Node}
+
+A node is an executable process participating in a ROS graph.
+
+Examples:
+
+\begin{itemize}
+\item Camera node
+\item LiDAR node
+\item Navigation node
+\item Motor controller node
+\end{itemize}
+
+\subsection{Topic}
+
+Topics provide asynchronous communication.
+
+Example:
+
+\begin{verbatim}
+/camera/image
+/scan
+/cmd_vel
+\end{verbatim}
+
+\subsection{Publisher}
+
+Produces messages.
+
+\subsection{Subscriber}
+
+Consumes messages.
+
+\subsection{Service}
+
+Synchronous request-response communication.
+
+\subsection{Action}
+
+Long-running operations with feedback.
+
+\section{ROS 2 Middleware Stack}
+
+\subsection{Application Layer}
+
+User code written using:
+
+\begin{itemize}
+\item rclcpp (C++)
+\item rclpy (Python)
+\item rclc (C)
+\end{itemize}
+
+\subsection{RCL}
+
+ROS Client Library abstraction.
+
+Responsibilities:
+
+\begin{itemize}
+\item Node creation
+\item Topic creation
+\item Timer management
+\item Executor interaction
+\end{itemize}
+
+\subsection{RMW}
+
+ROS Middleware abstraction layer.
+
+Responsibilities:
+
+\begin{itemize}
+\item DDS interaction
+\item Serialization
+\item Discovery
+\end{itemize}
+
+\subsection{DDS}
+
+Data Distribution Service performs:
+
+\begin{itemize}
+\item Discovery
+\item Transport
+\item Reliability
+\item QoS management
+\end{itemize}
+
+\section{Development in C}
+
+The C client library is called rclc.
+
+Typical usage:
+
+\begin{enumerate}
+\item Initialize context
+\item Create node
+\item Create publisher/subscriber
+\item Create executor
+\item Spin executor
+\end{enumerate}
+
+Advantages:
+
+\begin{itemize}
+\item Small memory footprint
+\item Embedded support
+\item Micro-ROS compatibility
+\end{itemize}
+
+\section{Development in C++}
+
+The C++ client library is rclcpp.
+
+Typical structure:
+
+\begin{verbatim}
+class MyNode : public rclcpp::Node
+{
+public:
+    MyNode() : Node("my_node")
+    {
+    }
+};
+\end{verbatim}
+
+Advantages:
+
+\begin{itemize}
+\item Strong typing
+\item High performance
+\item Production robot deployments
+\end{itemize}
+
+\section{Development in Python}
+
+The Python client library is rclpy.
+
+Typical structure:
+
+\begin{verbatim}
+class MyNode(Node):
+    def __init__(self):
+        super().__init__("my_node")
+\end{verbatim}
+
+Advantages:
+
+\begin{itemize}
+\item Rapid development
+\item Easy prototyping
+\item AI and ML integration
+\end{itemize}
+
+\section{ROS 2 Build System}
+
+\subsection{ament}
+
+ROS 2 uses ament as the build framework.
+
+\subsection{colcon}
+
+Build command:
+
+\begin{verbatim}
+colcon build
+\end{verbatim}
+
+Workspace structure:
+
+\begin{verbatim}
+workspace/
+ ├── src/
+ ├── build/
+ ├── install/
+ └── log/
+\end{verbatim}
+
+\section{Talker and Listener Example}
+
+Example:
+
+\begin{verbatim}
+ros2 run demo_nodes_cpp talker
+ros2 run demo_nodes_py listener
+\end{verbatim}
+
+\section{What Happens When Talker Starts?}
+
+Step 1:
+
+Operating system creates a process.
+
+\begin{verbatim}
+PID 1001
+talker process
+\end{verbatim}
+
+Step 2:
+
+main() executes.
+
+Step 3:
+
+rclcpp::init() initializes ROS.
+
+Step 4:
+
+Node object is created.
+
+\begin{verbatim}
+Node name = talker
+\end{verbatim}
+
+Step 5:
+
+Publisher object is created.
+
+\begin{verbatim}
+Topic:
+/chatter
+\end{verbatim}
+
+Step 6:
+
+DDS participant is created.
+
+Step 7:
+
+DDS announces:
+
+\begin{verbatim}
+I publish topic /chatter
+Type = std_msgs/String
+\end{verbatim}
+
+\section{What Happens When Listener Starts?}
+
+Step 1:
+
+Operating system creates listener process.
+
+Step 2:
+
+ROS initialization occurs.
+
+Step 3:
+
+Node object is created.
+
+\begin{verbatim}
+listener
+\end{verbatim}
+
+Step 4:
+
+Subscriber created.
+
+\begin{verbatim}
+Topic:
+/chatter
+\end{verbatim}
+
+Step 5:
+
+DDS discovery starts.
+
+Step 6:
+
+Publisher and subscriber discover each other.
+
+\section{Discovery Mechanism}
+
+DDS performs automatic discovery.
+
+Publisher broadcasts:
+
+\begin{verbatim}
+Topic Name
+Message Type
+QoS Profile
+\end{verbatim}
+
+Subscriber receives metadata.
+
+Matching occurs.
+
+Connection is established automatically.
+
+\section{Message Flow}
+
+Message path:
+
+\begin{verbatim}
+Talker Node
+     |
+Publisher
+     |
+rclcpp
+     |
+rcl
+     |
+rmw
+     |
+DDS Writer
+     |
+Network
+     |
+DDS Reader
+     |
+rmw
+     |
+rclpy
+     |
+Subscriber Callback
+     |
+Listener Node
+\end{verbatim}
+
+\section{Serialization}
+
+Before transmission:
+
+\begin{enumerate}
+\item Message object created
+\item Converted to binary stream
+\item Passed to DDS
+\item Sent over transport
+\end{enumerate}
+
+Example:
+
+\begin{verbatim}
+"Hello World: 10"
+\end{verbatim}
+
+becomes serialized bytes.
+
+\section{Receiving a Message}
+
+Listener side:
+
+\begin{enumerate}
+\item DDS receives bytes
+\item DDS validates message
+\item Deserialization occurs
+\item Callback scheduled
+\item Executor executes callback
+\end{enumerate}
+
+Example callback:
+
+\begin{verbatim}
+def callback(msg):
+    print(msg.data)
+\end{verbatim}
+
+\section{Executors}
+
+Executors run callbacks.
+
+Single-threaded:
+
+\begin{verbatim}
+rclcpp::spin(node);
+\end{verbatim}
+
+Responsibilities:
+
+\begin{itemize}
+\item Wait for events
+\item Process timers
+\item Execute subscriptions
+\item Execute services
+\end{itemize}
+
+\section{Quality of Service (QoS)}
+
+QoS controls communication behavior.
+
+Parameters:
+
+\begin{itemize}
+\item Reliability
+\item Durability
+\item History
+\item Deadline
+\item Lifespan
+\end{itemize}
+
+\section{Intra-Process Communication}
+
+If nodes are in the same process:
+
+\begin{itemize}
+\item Copies can be reduced
+\item Performance increases
+\item Latency decreases
+\end{itemize}
+
+\section{Debugging Tools}
+
+Useful commands:
+
+\begin{verbatim}
+ros2 node list
+ros2 topic list
+ros2 topic echo /chatter
+ros2 topic info /chatter
+ros2 doctor
+\end{verbatim}
+
+\section{Recommended Learning Path}
+
+\begin{enumerate}
+\item Learn nodes and topics
+\item Learn publishers and subscribers
+\item Learn services
+\item Learn actions
+\item Learn parameters
+\item Learn launch files
+\item Learn custom messages
+\item Learn DDS and QoS
+\item Learn lifecycle nodes
+\item Build a complete robot application
+\end{enumerate}
+
+\section{Conclusion}
+
+ROS 2 applications are collections of nodes communicating through DDS.
+The talker/listener example demonstrates the complete communication chain:
+process creation, node initialization, DDS discovery, message serialization,
+transport, deserialization, callback execution, and application-level handling.
+
+\end{document}

@@ -1,0 +1,173 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\title{ROS 2 Installation and Cleanup Guide}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+
+This guide covers:
+\begin{itemize}
+\item Cleaning up broken ROS repositories.
+\item Installing ROS 2 Jazzy on Ubuntu 24.04 (Noble).
+\item Installing ROS 2 Lyrical on Ubuntu 26.04 (Resolute).
+\end{itemize}
+
+\section{Cleanup (Ubuntu 24.04 and 26.04)}
+
+If you previously added incorrect ROS repositories and receive errors such as:
+
+\begin{verbatim}
+E: The repository 'http://ros.org noble Release'
+does not have a Release file.
+\end{verbatim}
+
+Clean the package lists:
+
+\begin{verbatim}
+sudo rm -rf /var/lib/apt/lists/*
+sudo apt clean
+sudo apt update
+\end{verbatim}
+
+Check for ROS repository entries:
+
+\begin{verbatim}
+grep -R "packages.ros.org\|ros.org" /etc/apt 2>/dev/null
+\end{verbatim}
+
+List configured source files:
+
+\begin{verbatim}
+ls -la /etc/apt/sources.list.d/
+\end{verbatim}
+
+Remove obsolete ROS source files if present:
+
+\begin{verbatim}
+sudo rm -f /etc/apt/sources.list.d/ros*.list
+sudo rm -f /etc/apt/sources.list.d/*ros*
+\end{verbatim}
+
+Refresh apt:
+
+\begin{verbatim}
+sudo apt update
+\end{verbatim}
+
+\section{Ubuntu 26.04 (Resolute) --- ROS 2 Lyrical}
+
+Install prerequisites:
+
+\begin{verbatim}
+sudo apt install -y software-properties-common
+sudo add-apt-repository universe
+sudo apt update
+sudo apt install -y curl
+\end{verbatim}
+
+Install the ROS apt source package:
+
+\begin{verbatim}
+export ROS_APT_SOURCE_VERSION=$(curl -s \
+https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest \
+| grep -F "tag_name" | awk -F'"' '{print $4}')
+
+curl -L -o /tmp/ros2-apt-source.deb \
+"https://github.com/ros-infrastructure/ros-apt-source/releases/download/\
+${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.\
+$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+
+sudo dpkg -i /tmp/ros2-apt-source.deb
+sudo apt update
+\end{verbatim}
+
+Install ROS 2 Lyrical:
+
+\begin{verbatim}
+sudo apt install -y ros-lyrical-desktop
+\end{verbatim}
+
+Configure the shell:
+
+\begin{verbatim}
+echo "source /opt/ros/lyrical/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+\end{verbatim}
+
+\section{Ubuntu 24.04 (Noble) --- ROS 2 Jazzy}
+
+Install prerequisites:
+
+\begin{verbatim}
+sudo apt install -y software-properties-common
+sudo add-apt-repository universe
+sudo apt update
+sudo apt install -y curl
+\end{verbatim}
+
+Install the ROS apt source package:
+
+\begin{verbatim}
+export ROS_APT_SOURCE_VERSION=$(curl -s \
+https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest \
+| grep -F "tag_name" | awk -F'"' '{print $4}')
+
+curl -L -o /tmp/ros2-apt-source.deb \
+"https://github.com/ros-infrastructure/ros-apt-source/releases/download/\
+${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.\
+noble_all.deb"
+
+sudo dpkg -i /tmp/ros2-apt-source.deb
+sudo apt update
+\end{verbatim}
+
+Install ROS 2 Jazzy:
+
+\begin{verbatim}
+sudo apt install -y ros-jazzy-desktop
+\end{verbatim}
+
+Configure the shell:
+
+\begin{verbatim}
+echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+\end{verbatim}
+
+\section{Verification}
+
+Check the installation:
+
+\begin{verbatim}
+which ros2
+echo $ROS_DISTRO
+ros2 doctor --report
+\end{verbatim}
+
+Run a simple test:
+
+Terminal 1:
+
+\begin{verbatim}
+ros2 run demo_nodes_cpp talker
+\end{verbatim}
+
+Terminal 2:
+
+\begin{verbatim}
+ros2 run demo_nodes_py listener
+\end{verbatim}
+
+If messages appear in the listener terminal, ROS 2 is functioning correctly.
+
+\end{document}
